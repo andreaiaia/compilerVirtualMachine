@@ -1,0 +1,19 @@
+push constant 10
+  push static 10
+push local 10
+pop
+add
+sub
+neg
+eq
+gt
+lt
+and
+or
+not
+label
+goto
+if-goto
+function
+call
+return

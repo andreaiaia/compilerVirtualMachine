@@ -22,12 +22,12 @@ void to_bin(int i, int out[]) {
 void clear(char riga[]) {
   int i = 0;
   int j = 0;
+  int stop = 0;
+  while(riga[i] == ' ' || riga[i] == '\t') i++;
   char pulita[128];
-  while((riga[i] != '\0') && (riga[i] != '/')) {  // Ciclo la riga finché non trovo un commento o la riga finisce
-    if (riga[i] != '\t') {      // Se il carattere "puntato" non è uno spazio o un tab
-      pulita[j] = riga[i];                        // lo copio nella riga ripulita
-      j++;
-    }
+  while((riga[i] != '\0') && (riga[i] != '/')) {  // Ciclo la riga finché non trovo un commento o la riga finisce    // Se il carattere "puntato" non è uno spazio o un tab
+    pulita[j] = riga[i];                        // lo copio nella riga ripulita
+    j++;
     i++;
   }
   pulita[j] = '\0';            // Aggiungo il terminatore
@@ -40,4 +40,145 @@ void bootstrap(FILE * output) {
   write("D=A", output);
   write("@SP", output);
   write("M=D", output);
+}
+
+void identificacmd(char riga[], char cmd[]) {
+  int i = 0, j = 0;
+  int stop = 0;
+  while (riga[i] != '\0' && !stop) {
+    if ((riga[i] >= 'A' && riga[i] <= 'Z') || (riga[i] >= 'a' && riga[i] <= 'z')) {
+      cmd[j] = riga[i];
+      j++;
+      if (riga[i + 1] == ' ')
+        stop = 1;
+    }
+    i++;
+  }
+  cmd[j] = '\0';
+}
+
+void identificaseg(char riga[], char seg[]) {
+  int i = 0, j = 0;
+  while (riga[i] != ' ') i++;
+  i++;
+  while(riga[i] != ' ' && riga[i] != '\0') {
+    seg[j] = riga[i];
+    j++;
+    i++;
+  }
+  seg[j] = '\0';
+}
+
+void estrainum(char riga[], char num[])
+{
+  num[0] = '@';
+  int i = 0, j = 1;
+  while (riga[i] != ' ')
+    i++;
+  i++;
+  while (riga[i] != ' ')
+    i++;
+  i++;
+  while (riga[i] != ' ' && riga[i] != '\0' && riga[i] != '\n' && riga[i] != '\r')
+  {
+    num[j] = riga[i];
+    j++;
+    i++;
+  }
+  num[j] = '\0';
+}
+
+void exec_cmd(char riga[], char cmd[], FILE * output) {
+  if (!strcmp(cmd, "push"))
+  {
+    char segmento[strlen(riga)];
+    identificaseg(riga, segmento);
+    exec_seg(riga, segmento, output);
+  }
+  else if (!strcmp(cmd, "pop")) 
+  {
+    printf("è un pop\n");
+  }
+  else if (!strcmp(cmd, "add"))
+  {
+    printf("è un add\n");
+  }
+  else if (!strcmp(cmd, "sub"))
+  {
+    printf("è un sub\n");
+  }
+  else if (!strcmp(cmd, "neg"))
+  {
+    printf("è un neg\n");
+  }
+  else if (!strcmp(cmd, "eq"))
+  {
+    printf("è un eq\n");
+  }
+  else if (!strcmp(cmd, "gt"))
+  {
+    printf("è un gt\n");
+  }
+  else if (!strcmp(cmd, "lt"))
+  {
+    printf("è un lt\n");
+  }
+  else if (!strcmp(cmd, "and"))
+  {
+    printf("è un and\n");
+  }
+  else if (!strcmp(cmd, "or"))
+  {
+    printf("è un or\n");
+  }
+  else if (!strcmp(cmd, "not"))
+  {
+    printf("è un not\n");
+  }
+  else if (!strcmp(cmd, "label"))
+  {
+    printf("è un label\n");
+  }
+  else if (!strcmp(cmd, "goto"))
+  {
+    printf("è un goto\n");
+  }
+  else if (!strcmp(cmd, "ifgoto"))
+  {
+    printf("è un if-goto\n");
+  }
+  else if (!strcmp(cmd, "function"))
+  {
+    printf("è un function\n");
+  }
+  else if (!strcmp(cmd, "call"))
+  {
+    printf("è un call\n");
+  }
+  else if (!strcmp(cmd, "return"))
+  {
+    printf("è un return\n");
+  }
+}
+
+void exec_seg(char riga[], char seg[], FILE * output) {
+  if (!strcmp(seg, "constant")) 
+  {
+    char num[strlen(riga)];
+    estrainum(riga, num);
+    write(num, output);
+    write("D=A", output);
+    write("@SP", output);
+    write("A=M", output);
+    write("M=D", output);
+    write("@SP", output);
+    write("M=M+1", output);
+  }
+  else if (!strcmp(seg, "local")) 
+  {
+
+  }
+  else if (!strcmp(seg, "static")) {
+
+  }
 }

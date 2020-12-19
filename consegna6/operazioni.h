@@ -7,4 +7,9 @@
 int a_to_i(char[]);
 void to_bin(int, int[]);
 void clear(char[]);
-void bootstrap(FILE *);
+void bootstrap(FILE*);
+void identificacmd(char[], char[]);
+void exec_cmd(char[], char[], FILE *);
+void identificaseg(char[], char[]);
+void exec_seg(char[], char[], FILE *);
+void estrainum(char[], char[]);
