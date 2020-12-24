@@ -3,3 +3,4 @@
 #include <string.h>
 
 void rename_file(char[], char[]);
+void write(char[], FILE *);

@@ -395,7 +395,7 @@ D=M
 @SP
 M=M-1
 A=M
-M=M+D
+M=D+M
 @SP
 M=M+1
 //push constant 112
