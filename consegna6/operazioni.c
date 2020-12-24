@@ -101,8 +101,17 @@ void exec_cmd(char riga[], char cmd[], FILE * output) {
   }
   else if (!strcmp(cmd, "add"))
   {
-    printf("è un add\n");
-  }
+    write("@SP", output); 
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=M", output);
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("M=D+M", output);
+    write("@SP", output);
+    write("M=M+1", output);
+  }/*
   else if (!strcmp(cmd, "sub"))
   {
     printf("è un sub\n");
@@ -158,7 +167,7 @@ void exec_cmd(char riga[], char cmd[], FILE * output) {
   else if (!strcmp(cmd, "return"))
   {
     printf("è un return\n");
-  }
+  }*/
 }
 
 void exec_seg(char riga[], char seg[], FILE * output) {
