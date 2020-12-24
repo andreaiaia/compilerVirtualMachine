@@ -71,8 +71,7 @@ void identificaseg(char riga[], char seg[]) {
 
 void estrainum(char riga[], char num[])
 {
-  num[0] = '@';
-  int i = 0, j = 1;
+  int i = 0, j = 0;
   while (riga[i] != ' ')
     i++;
   i++;
@@ -93,11 +92,13 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
   {
     char segmento[strlen(riga)];
     identificaseg(riga, segmento);
-    exec_seg(riga, segmento, output);
+    exec_seg_push(riga, segmento, output);
   }
   else if (!strcmp(cmd, "pop")) 
   {
-    printf("è un pop\n");
+    char segmento[strlen(riga)];
+    identificaseg(riga, segmento);
+    exec_seg_pop(riga, segmento, output);
   }
   else if (!strcmp(cmd, "add"))
   {
@@ -276,10 +277,10 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
   }*/
 }
 
-void exec_seg(char riga[], char seg[], FILE * output) {
+void exec_seg_push(char riga[], char seg[], FILE * output) {
   char num[strlen(riga)];
   estrainum(riga, num);
-  write(num, output);
+  fprintf(output, "@%d\n", num);
   write("D=A", output);
   if (!strcmp(seg, "constant")) 
   {
@@ -307,5 +308,52 @@ void exec_seg(char riga[], char seg[], FILE * output) {
     write("M=D", output);
     write("@ARG", output);
   }
-  write("M=M+1", output);
+  fprintf(output, "M=M+1\n");
+}
+
+void exec_seg_pop(char riga[], char seg[], FILE *output)
+{
+  char anum[strlen(riga)];
+  estrainum(riga, anum);
+  int num = a_to_i(anum);
+  if (!strcmp(seg, "constant"))
+  {
+    
+  }
+  else if (!strcmp(seg, "local"))
+  {
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M-1\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@LCL\n");
+    fprintf(output, "A=A+%d\n", num);
+    fprintf(output, "M=D\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M+1\n");
+  }
+  else if (!strcmp(seg, "static"))
+  {
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M-1\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@%d\n", 16+num);
+    fprintf(output, "M=D\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M+1\n");
+  }
+  else if (!strcmp(seg, "argument"))
+  {
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M-1\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@ARG\n");
+    fprintf(output, "A=A+%d\n", num);
+    fprintf(output, "M=D\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M+1\n");
+  }
+  
 }
