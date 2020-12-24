@@ -88,7 +88,7 @@ void estrainum(char riga[], char num[])
   num[j] = '\0';
 }
 
-void exec_cmd(char riga[], char cmd[], FILE * output) {
+void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
   if (!strcmp(cmd, "push"))
   {
     char segmento[strlen(riga)];
@@ -111,39 +111,130 @@ void exec_cmd(char riga[], char cmd[], FILE * output) {
     write("M=D+M", output);
     write("@SP", output);
     write("M=M+1", output);
-  }/*
+  }
   else if (!strcmp(cmd, "sub"))
   {
-    printf("è un sub\n");
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=M", output);
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("M=M-D", output);
+    write("@SP", output);
+    write("M=M+1", output);
   }
   else if (!strcmp(cmd, "neg"))
   {
-    printf("è un neg\n");
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("M=-M", output);
+    write("@SP", output);
+    write("M=M+1", output);
   }
   else if (!strcmp(cmd, "eq"))
   {
-    printf("è un eq\n");
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=M", output);
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=M-D", output);
+    fprintf(output, "@IF_TRUE%d\n", *conditioncounter);
+    write("D;JEQ", output);
+    write("M=0", output);
+    fprintf(output, "@END%d\n", *conditioncounter);
+    write("0;JMP", output);
+    write("(IF_TRUE)", output);
+    write("M=1", output);
+    fprintf(output, "(END%d)\n", *conditioncounter);
+    write("@SP", output);
+    write("M=M+1", output);
+    *conditioncounter++;
   }
   else if (!strcmp(cmd, "gt"))
   {
-    printf("è un gt\n");
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=M", output);
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=D-M", output);
+    fprintf(output, "@IF_TRUE%d\n", *conditioncounter);
+    write("D;JGT", output);
+    write("M=0", output);
+    fprintf(output, "@END%d\n", *conditioncounter);
+    write("0;JMP", output);
+    write("(IF_TRUE)", output);
+    write("M=1", output);
+    fprintf(output, "(END%d)\n", *conditioncounter);
+    write("@SP", output);
+    write("M=M+1", output);
+    *conditioncounter++;
   }
   else if (!strcmp(cmd, "lt"))
   {
-    printf("è un lt\n");
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=M", output);
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=D-M", output);
+    fprintf(output, "@IF_TRUE%d\n", *conditioncounter);
+    write("D;JLT", output);
+    write("M=0", output);
+    fprintf(output, "@END%d\n", *conditioncounter);
+    write("0;JMP", output);
+    write("(IF_TRUE)", output);
+    write("M=1", output);
+    fprintf(output, "(END%d)\n", *conditioncounter);
+    write("@SP", output);
+    write("M=M+1", output);
+    *conditioncounter++;
   }
   else if (!strcmp(cmd, "and"))
   {
-    printf("è un and\n");
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=M", output);
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("M=M&D", output);
+    write("@SP", output);
+    write("M=M+1", output);
   }
   else if (!strcmp(cmd, "or"))
   {
-    printf("è un or\n");
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("D=M", output);
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("M=M|D", output);
+    write("@SP", output);
+    write("M=M+1", output);
   }
   else if (!strcmp(cmd, "not"))
   {
-    printf("è un not\n");
-  }
+    write("@SP", output);
+    write("M=M-1", output);
+    write("A=M", output);
+    write("M=!M", output);
+    write("@SP", output);
+    write("M=M+1", output);
+  }/*
   else if (!strcmp(cmd, "label"))
   {
     printf("è un label\n");
@@ -171,23 +262,35 @@ void exec_cmd(char riga[], char cmd[], FILE * output) {
 }
 
 void exec_seg(char riga[], char seg[], FILE * output) {
+  char num[strlen(riga)];
+  estrainum(riga, num);
+  write(num, output);
+  write("D=A", output);
   if (!strcmp(seg, "constant")) 
   {
-    char num[strlen(riga)];
-    estrainum(riga, num);
-    write(num, output);
-    write("D=A", output);
     write("@SP", output);
     write("A=M", output);
     write("M=D", output);
     write("@SP", output);
-    write("M=M+1", output);
+
   }
   else if (!strcmp(seg, "local")) 
   {
+    write("@LCL", output);
+    write("A=M", output);
+    write("M=D", output);
+    write("@LCL", output);
+  }
+  else if (!strcmp(seg, "static")) 
+  {
 
   }
-  else if (!strcmp(seg, "static")) {
-
+  else if (!strcmp(seg, "argument")) 
+  {
+    write("@ARG", output);
+    write("A=M", output);
+    write("M=D", output);
+    write("@ARG", output);
   }
+  write("M=M+1", output);
 }

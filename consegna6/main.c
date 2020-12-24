@@ -6,7 +6,7 @@
 #include "gestionefile.h"
 #include "operazioni.h"
 
-void smista(char[], FILE *);
+void smista(char[], FILE *, int *);
 
 int main(int argc, char **argv)
 {
@@ -27,11 +27,13 @@ int main(int argc, char **argv)
 
   // Traduzione delle istruzioni
   int i = 16;
+  int * conditioncounter = malloc(sizeof(int));
+  *conditioncounter = 0;
   while(fgets(riga, 127, vmach)) {    // Itero per ogni riga del file asm
     clear(riga);
     if (riga[0] != '/' && riga[0] != '\r' && riga[0] != '\n' && riga[0] != '\0')
     {
-      smista(riga, output);
+      smista(riga, output, conditioncounter);
     }
   }
 
@@ -40,13 +42,13 @@ int main(int argc, char **argv)
   return 0;
 }
 
-void smista(char riga[], FILE * output) {
+void smista(char riga[], FILE * output, int * conditioncounter) {
   fprintf(output, "//%s", riga);     // commento con il nome del blocco di codice che sto per inserire, per leggibilità
   char cmd[10];
 
   identificacmd(riga, cmd);           // from operazioni.c
 
-  exec_cmd(riga, cmd, output);
+  exec_cmd(riga, cmd, output, conditioncounter);
 
   //write(codifica, output);
 }
