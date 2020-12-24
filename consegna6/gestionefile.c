@@ -13,7 +13,3 @@ void rename_file(char in_name[], char out_name[])
   }
   out_name[i] = '\0';         // Chiudo la stringa
 }
-
-void write(char riga[], FILE *output) {
-  fprintf(output, "%s\n", riga);
-}
