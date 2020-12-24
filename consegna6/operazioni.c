@@ -143,18 +143,23 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
     write("@SP", output);
     write("M=M-1", output);
     write("A=M", output);
-    write("D=M-D", output);
+    write("M=M-D", output);
+    write("D=M", output);
     fprintf(output, "@IF_TRUE%d\n", *conditioncounter);
     write("D;JEQ", output);
+    write("@SP", output);
+    write("A=M", output);
     write("M=0", output);
     fprintf(output, "@END%d\n", *conditioncounter);
     write("0;JMP", output);
-    write("(IF_TRUE)", output);
-    write("M=1", output);
+    fprintf(output, "(IF_TRUE%d)\n", *conditioncounter);
+    write("@SP", output);
+    write("A=M", output);
+    write("M=-1", output);
     fprintf(output, "(END%d)\n", *conditioncounter);
     write("@SP", output);
     write("M=M+1", output);
-    *conditioncounter++;
+    *conditioncounter = *conditioncounter + 1;
   }
   else if (!strcmp(cmd, "gt"))
   {
@@ -165,18 +170,23 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
     write("@SP", output);
     write("M=M-1", output);
     write("A=M", output);
-    write("D=D-M", output);
+    write("M=M-D", output);
+    write("D=M", output);
     fprintf(output, "@IF_TRUE%d\n", *conditioncounter);
     write("D;JGT", output);
+    write("@SP", output);
+    write("A=M", output);
     write("M=0", output);
     fprintf(output, "@END%d\n", *conditioncounter);
     write("0;JMP", output);
-    write("(IF_TRUE)", output);
-    write("M=1", output);
+    fprintf(output, "(IF_TRUE%d)\n", *conditioncounter);
+    write("@SP", output);
+    write("A=M", output);
+    write("M=-1", output);
     fprintf(output, "(END%d)\n", *conditioncounter);
     write("@SP", output);
     write("M=M+1", output);
-    *conditioncounter++;
+    *conditioncounter = *conditioncounter + 1;
   }
   else if (!strcmp(cmd, "lt"))
   {
@@ -187,18 +197,23 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
     write("@SP", output);
     write("M=M-1", output);
     write("A=M", output);
-    write("D=D-M", output);
+    write("M=M-D", output);
+    write("D=M", output);
     fprintf(output, "@IF_TRUE%d\n", *conditioncounter);
     write("D;JLT", output);
+    write("@SP", output);
+    write("A=M", output);
     write("M=0", output);
     fprintf(output, "@END%d\n", *conditioncounter);
     write("0;JMP", output);
-    write("(IF_TRUE)", output);
-    write("M=1", output);
+    fprintf(output, "(IF_TRUE%d)\n", *conditioncounter);
+    write("@SP", output);
+    write("A=M", output);
+    write("M=-1", output);
     fprintf(output, "(END%d)\n", *conditioncounter);
     write("@SP", output);
     write("M=M+1", output);
-    *conditioncounter++;
+    *conditioncounter = *conditioncounter + 1;
   }
   else if (!strcmp(cmd, "and"))
   {
