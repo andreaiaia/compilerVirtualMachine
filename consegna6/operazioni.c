@@ -4,7 +4,7 @@
 // Funzione che legge una stringa e restituisce un intero
 int a_to_i(char riga[]) {
   int num = 0;
-  for(int i = 1; riga[i] >= '0' && riga[i] <= '9'; i++)
+  for(int i = 0; riga[i] >= '0' && riga[i] <= '9'; i++)
     num = num*10 + riga[i] - '0';
 
   return num;
@@ -57,7 +57,7 @@ void identificacmd(char riga[], char cmd[]) {
   cmd[j] = '\0';
 }
 
-void identificaseg(char riga[], char seg[]) {
+void identificalabel(char riga[], char seg[]) {
   int i = 0, j = 0;
   while (riga[i] != ' ') i++;
   i++;
@@ -91,13 +91,13 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
   if (!strcmp(cmd, "push"))
   {
     char segmento[strlen(riga)];
-    identificaseg(riga, segmento);
+    identificalabel(riga, segmento);
     exec_seg_push(riga, segmento, output, assm);
   }
   else if (!strcmp(cmd, "pop")) 
   {
     char segmento[strlen(riga)];
-    identificaseg(riga, segmento);
+    identificalabel(riga, segmento);
     exec_seg_pop(riga, segmento, output, assm);
   }
   else if (!strcmp(cmd, "add"))
@@ -254,30 +254,43 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
   else if (!strcmp(cmd, "label"))
   {
     char label[strlen(riga)];
-    identificaseg(riga, label);
+    identificalabel(riga, label);
     fprintf(output, "(%s)\n", label);
   }
   else if (!strcmp(cmd, "goto"))
   {
     char label[strlen(riga)];
-    identificaseg(riga, label);
+    identificalabel(riga, label);
     fprintf(output, "@%s\n", label);
     fprintf(output, "0;JMP\n");
   }
   else if (!strcmp(cmd, "ifgoto"))
   {
     char label[strlen(riga)];
-    identificaseg(riga, label);
+    identificalabel(riga, label);
     fprintf(output, "@SP\n");
     fprintf(output, "M=M-1\n");
     fprintf(output, "A=M\n");
     fprintf(output, "D=M\n");
     fprintf(output, "@%s\n", label);
     fprintf(output, "D;JNE\n");
-  }/*
+  }
   else if (!strcmp(cmd, "function"))
   {
-    printf("è un function\n");
+    char label[strlen(riga)];
+    identificalabel(riga, label);
+    fprintf(output, "(%s)\n", label);
+    char num[strlen(riga)];
+    estrainum(riga, num);
+    int nnum = a_to_i(num);
+    for (int i = 1; i <= nnum; i++) {
+      fprintf(output, "@%d\n", i);
+      fprintf(output, "D=A\n");
+      fprintf(output, "@ARG\n");
+      fprintf(output, "D=D+M\n");
+      fprintf(output, "A=D\n");
+      fprintf(output, "M=0\n");
+    }
   }
   else if (!strcmp(cmd, "call"))
   {
@@ -285,8 +298,8 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
   }
   else if (!strcmp(cmd, "return"))
   {
-    printf("è un return\n");
-  }*/
+    
+  }
 }
 
 void exec_seg_push(char riga[], char seg[], FILE *output, char assm[])

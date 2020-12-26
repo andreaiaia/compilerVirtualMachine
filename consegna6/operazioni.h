@@ -10,7 +10,7 @@ void clear(char[]);
 void bootstrap(FILE*);
 void identificacmd(char[], char[]);
 void exec_cmd(char[], char[], FILE *, int *, char[]);
-void identificaseg(char[], char[]);
+void identificalabel(char[], char[]);
 void exec_seg_push(char[], char[], FILE *, char[]);
 void exec_seg_pop(char[], char[], FILE *, char[]);
 void estrainum(char[], char[]);
