@@ -25,7 +25,7 @@ void clear(char riga[]) {
   int stop = 0;
   while(riga[i] == ' ' || riga[i] == '\t') i++;
   char pulita[128];
-  while((riga[i] != '\0') && (riga[i] != '/')) {  // Ciclo la riga finché non trovo un commento o la riga finisce    // Se il carattere "puntato" non è uno spazio o un tab
+  while((riga[i] != '\0') && (riga[i] != '/') && (riga[i] != '\r') && (riga[i] != '\n')) {  // Ciclo la riga finché non trovo un commento o la riga finisce    // Se il carattere "puntato" non è uno spazio o un tab
     pulita[j] = riga[i];                        // lo copio nella riga ripulita
     j++;
     i++;

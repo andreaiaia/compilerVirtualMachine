@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 }
 
 void smista(char riga[], FILE * output, int * conditioncounter, char assm[]) {
-  fprintf(output, "//%s", riga);     // commento con il nome del blocco di codice che sto per inserire, per leggibilità
+  fprintf(output, "//%s\n", riga);     // commento con il nome del blocco di codice che sto per inserire, per leggibilità
   char cmd[10];
 
   identificacmd(riga, cmd);           // from operazioni.c
