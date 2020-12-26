@@ -61,7 +61,7 @@ void identificaseg(char riga[], char seg[]) {
   int i = 0, j = 0;
   while (riga[i] != ' ') i++;
   i++;
-  while(riga[i] != ' ' && riga[i] != '\0') {
+  while(riga[i] != ' ' && riga[i] != '\0' && riga[i] != '\r' && riga[i] != '\n') {
     seg[j] = riga[i];
     j++;
     i++;
@@ -87,18 +87,18 @@ void estrainum(char riga[], char num[])
   num[j] = '\0';
 }
 
-void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
+void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, char assm[]) {
   if (!strcmp(cmd, "push"))
   {
     char segmento[strlen(riga)];
     identificaseg(riga, segmento);
-    exec_seg_push(riga, segmento, output);
+    exec_seg_push(riga, segmento, output, assm);
   }
   else if (!strcmp(cmd, "pop")) 
   {
     char segmento[strlen(riga)];
     identificaseg(riga, segmento);
-    exec_seg_pop(riga, segmento, output);
+    exec_seg_pop(riga, segmento, output, assm);
   }
   else if (!strcmp(cmd, "add"))
   {
@@ -250,10 +250,12 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
     write("M=!M", output);
     write("@SP", output);
     write("M=M+1", output);
-  }/*
+  }
   else if (!strcmp(cmd, "label"))
   {
-    printf("è un label\n");
+    char label[strlen(riga)];
+    identificaseg(riga, label);
+    fprintf(output, "(%s)\n", label);
   }
   else if (!strcmp(cmd, "goto"))
   {
@@ -262,7 +264,7 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
   else if (!strcmp(cmd, "ifgoto"))
   {
     printf("è un if-goto\n");
-  }
+  }/*
   else if (!strcmp(cmd, "function"))
   {
     printf("è un function\n");
@@ -277,60 +279,64 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter) {
   }*/
 }
 
-void exec_seg_push(char riga[], char seg[], FILE * output) {
+void exec_seg_push(char riga[], char seg[], FILE *output, char assm[])
+{
   char num[strlen(riga)];
   estrainum(riga, num);
-  fprintf(output, "@%d\n", num);
-  write("D=A", output);
   if (!strcmp(seg, "constant")) 
   {
-    write("@SP", output);
-    write("A=M", output);
-    write("M=D", output);
-    write("@SP", output);
-
+    fprintf(output, "@%s\n", num);
+    fprintf(output, "D=A\n");
   }
   else if (!strcmp(seg, "local")) 
   {
-    write("@LCL", output);
-    write("A=M", output);
-    write("M=D", output);
-    write("@LCL", output);
+    fprintf(output, "@%s\n", num);
+    fprintf(output, "D=A\n");
+    fprintf(output, "@LCL\n");
+    fprintf(output, "D=D+M\n");
+    fprintf(output, "A=D\n");
+    fprintf(output, "D=M\n");
   }
   else if (!strcmp(seg, "static")) 
   {
-
+    fprintf(output, "@%s%s\n", assm, num);
+    fprintf(output, "D=M\n");
   }
   else if (!strcmp(seg, "argument")) 
   {
-    write("@ARG", output);
-    write("A=M", output);
-    write("M=D", output);
-    write("@ARG", output);
+    fprintf(output, "@%s\n", num);
+    fprintf(output, "D=A\n");
+    fprintf(output, "@ARG\n");
+    fprintf(output, "D=D+M\n");
+    fprintf(output, "A=D\n");
+    fprintf(output, "D=M\n");
   }
+  fprintf(output, "@SP\n");
+  fprintf(output, "A=M\n");
+  fprintf(output, "M=D\n");
+  fprintf(output, "@SP\n");
   fprintf(output, "M=M+1\n");
 }
 
-void exec_seg_pop(char riga[], char seg[], FILE *output)
+void exec_seg_pop(char riga[], char seg[], FILE *output, char assm[])
 {
-  char anum[strlen(riga)];
-  estrainum(riga, anum);
-  int num = a_to_i(anum);
-  if (!strcmp(seg, "constant"))
+  char num[strlen(riga)];
+  estrainum(riga, num);
+  if (!strcmp(seg, "local"))
   {
-    
-  }
-  else if (!strcmp(seg, "local"))
-  {
+    fprintf(output, "@%s\n", num);
+    fprintf(output, "D=A\n"); 
+    fprintf(output, "@LCL\n"); 
+    fprintf(output, "D=D+M\n"); 
+    fprintf(output, "@R6\n");
+    fprintf(output, "M=D\n"); 
     fprintf(output, "@SP\n");
     fprintf(output, "M=M-1\n");
     fprintf(output, "A=M\n");
     fprintf(output, "D=M\n");
-    fprintf(output, "@LCL\n");
-    fprintf(output, "A=A+%d\n", num);
+    fprintf(output, "@R6\n");
+    fprintf(output, "A=M\n");
     fprintf(output, "M=D\n");
-    fprintf(output, "@SP\n");
-    fprintf(output, "M=M+1\n");
   }
   else if (!strcmp(seg, "static"))
   {
@@ -338,22 +344,23 @@ void exec_seg_pop(char riga[], char seg[], FILE *output)
     fprintf(output, "M=M-1\n");
     fprintf(output, "A=M\n");
     fprintf(output, "D=M\n");
-    fprintf(output, "@%d\n", 16+num);
+    fprintf(output, "@%s%s\n", assm, num);
     fprintf(output, "M=D\n");
-    fprintf(output, "@SP\n");
-    fprintf(output, "M=M+1\n");
   }
   else if (!strcmp(seg, "argument"))
   {
+    fprintf(output, "@%s\n", num);
+    fprintf(output, "D=A\n");
+    fprintf(output, "@ARG\n");
+    fprintf(output, "D=D+M\n");
+    fprintf(output, "@R6\n");
+    fprintf(output, "M=D\n");
     fprintf(output, "@SP\n");
     fprintf(output, "M=M-1\n");
     fprintf(output, "A=M\n");
     fprintf(output, "D=M\n");
-    fprintf(output, "@ARG\n");
-    fprintf(output, "A=A+%d\n", num);
+    fprintf(output, "@R6\n");
+    fprintf(output, "A=M\n");
     fprintf(output, "M=D\n");
-    fprintf(output, "@SP\n");
-    fprintf(output, "M=M+1\n");
   }
-  
 }

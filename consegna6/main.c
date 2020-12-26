@@ -6,7 +6,7 @@
 #include "gestionefile.h"
 #include "operazioni.h"
 
-void smista(char[], FILE *, int *);
+void smista(char[], FILE *, int *, char[]);
 
 int main(int argc, char **argv)
 {
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     clear(riga);
     if (riga[0] != '/' && riga[0] != '\r' && riga[0] != '\n' && riga[0] != '\0')
     {
-      smista(riga, output, conditioncounter);
+      smista(riga, output, conditioncounter, assm);
     }
   }
 
@@ -42,13 +42,13 @@ int main(int argc, char **argv)
   return 0;
 }
 
-void smista(char riga[], FILE * output, int * conditioncounter) {
+void smista(char riga[], FILE * output, int * conditioncounter, char assm[]) {
   fprintf(output, "//%s", riga);     // commento con il nome del blocco di codice che sto per inserire, per leggibilità
   char cmd[10];
 
   identificacmd(riga, cmd);           // from operazioni.c
 
-  exec_cmd(riga, cmd, output, conditioncounter);
+  exec_cmd(riga, cmd, output, conditioncounter, assm);
 
   //write(codifica, output);
 }
