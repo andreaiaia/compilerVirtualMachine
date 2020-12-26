@@ -37,6 +37,8 @@ int main(int argc, char **argv)
     }
   }
 
+  fprintf(output, "(END)\n@END\n0;JMP");
+
   fclose(vmach);
   fclose(output);
   return 0;

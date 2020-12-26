@@ -106,3 +106,6 @@ M=M-D
 @SP
 M=M+1
 //return
+(END)
+@END
+0;JMP
