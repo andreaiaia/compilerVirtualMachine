@@ -259,7 +259,10 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
   }
   else if (!strcmp(cmd, "goto"))
   {
-    printf("è un goto\n");
+    char label[strlen(riga)];
+    identificaseg(riga, label);
+    fprintf(output, "@%s\n", label);
+    fprintf(output, "0;JMP\n");
   }
   else if (!strcmp(cmd, "ifgoto"))
   {
