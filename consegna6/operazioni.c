@@ -263,7 +263,14 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
   }
   else if (!strcmp(cmd, "ifgoto"))
   {
-    printf("è un if-goto\n");
+    char label[strlen(riga)];
+    identificaseg(riga, label);
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M-1\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@%s\n", label);
+    fprintf(output, "D;JNE\n");
   }/*
   else if (!strcmp(cmd, "function"))
   {
