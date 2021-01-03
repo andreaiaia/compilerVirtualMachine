@@ -286,7 +286,7 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
     for (int i = 1; i <= nnum; i++) {
       fprintf(output, "@%d\n", i);
       fprintf(output, "D=A\n");
-      fprintf(output, "@ARG\n");
+      fprintf(output, "@LCL\n");
       fprintf(output, "D=D+M\n");
       fprintf(output, "A=D\n");
       fprintf(output, "M=0\n");
@@ -294,11 +294,61 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
   }
   else if (!strcmp(cmd, "call"))
   {
+    *conditioncounter = *conditioncounter + 1;
     printf("è un call\n");
   }
   else if (!strcmp(cmd, "return"))
   {
-    
+    //FRAME=LCL
+    //fprintf(output, "@LCL\n");
+    //fprintf(output, "D=A\n");
+    //fprintf(output, "@FRAME\n");
+    //fprintf(output, "M=D\n");
+    /*RET=*(FRAME-5)
+    fprintf(output, "@5\n");
+    fprintf(output, "D=A\n");
+    fprintf(output, "@FRAME\n");
+    fprintf(output, "A=M-D\n");
+    fprintf(output, "D=A\n");
+    fprintf(output, "@RET\n");
+    fprintf(output, "M=D\n");*/
+    //*ARG=pop()
+    fprintf(output, "@ARG\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@R7\n");
+    fprintf(output, "M=D\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M-1\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@R7\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "M=D\n");
+    //SP=ARG+1
+    fprintf(output, "@ARG\n");
+    fprintf(output, "D=A+1\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=D\n");
+    //ARG=*(FRAME-3)
+    fprintf(output, "@2\n");
+    fprintf(output, "D=A\n");
+    fprintf(output, "@FRAME\n");
+    fprintf(output, "A=D+A\n");
+    fprintf(output, "D=A\n");
+    fprintf(output, "@ARG\n");
+    fprintf(output, "M=D\n");
+    //LCL=*(FRAME-4)
+    fprintf(output, "@1\n");
+    fprintf(output, "D=A\n");
+    fprintf(output, "@FRAME\n");
+    fprintf(output, "A=D+A\n");
+    fprintf(output, "D=A\n");
+    fprintf(output, "@LCL\n");
+    fprintf(output, "M=D\n");
+    //GOTO RET
+    fprintf(output, "@FRAME\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "0;JMP\n");
   }
 }
 
