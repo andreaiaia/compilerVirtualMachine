@@ -313,29 +313,31 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
     fprintf(output, "D=D+1\n");
     fprintf(output, "@SP\n");
     fprintf(output, "M=D\n");
-    // R6 = LCL
+    // RET = LCL - 5
     fprintf(output, "@LCL\n");
     fprintf(output, "D=M\n");
-    fprintf(output, "@R6\n");
-    fprintf(output, "M=D\n");
-    // RET = R6 - 5
     fprintf(output, "@5\n");
     fprintf(output, "D=D-A\n");
     fprintf(output, "@RET\n");
     fprintf(output, "M=D\n");
-    // ARG = R6 - 3
-    fprintf(output, "@R6\n");
-    fprintf(output, "D=M\n");
-    fprintf(output, "@3\n");
-    fprintf(output, "D=D-A\n");
-    fprintf(output, "@ARG\n");
-    fprintf(output, "M=D\n");
     // LCL = R6 - 4
-    fprintf(output, "D=D-1\n");
+    fprintf(output, "D=D+1\n");
+    fprintf(output, "A=D\n");
+    fprintf(output, "D=M\n");
     fprintf(output, "@LCL\n");
+    fprintf(output, "M=D\n");
+    // ARG = R6 - 3
+    fprintf(output, "@RET\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@2\n");
+    fprintf(output, "D=D+A\n");
+    fprintf(output, "A=D\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@ARG\n");
     fprintf(output, "M=D\n");
     // goto RET
     fprintf(output, "@RET\n");
+    fprintf(output, "A=M\n");
     fprintf(output, "0;JMP\n");
   }
 }
