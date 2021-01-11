@@ -299,55 +299,43 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
   }
   else if (!strcmp(cmd, "return"))
   {
-    //FRAME=LCL
-    //fprintf(output, "@LCL\n");
-    //fprintf(output, "D=A\n");
-    //fprintf(output, "@FRAME\n");
-    //fprintf(output, "M=D\n");
-    /*RET=*(FRAME-5)
-    fprintf(output, "@5\n");
-    fprintf(output, "D=A\n");
-    fprintf(output, "@FRAME\n");
-    fprintf(output, "A=M-D\n");
-    fprintf(output, "D=A\n");
-    fprintf(output, "@RET\n");
-    fprintf(output, "M=D\n");*/
-    //*ARG=pop()
-    fprintf(output, "@ARG\n");
-    fprintf(output, "D=M\n");
-    fprintf(output, "@R7\n");
-    fprintf(output, "M=D\n");
+    // ARG = pop()
     fprintf(output, "@SP\n");
     fprintf(output, "M=M-1\n");
     fprintf(output, "A=M\n");
     fprintf(output, "D=M\n");
-    fprintf(output, "@R7\n");
+    fprintf(output, "@ARG\n");
     fprintf(output, "A=M\n");
     fprintf(output, "M=D\n");
-    //SP=ARG+1
+    // SP = ARG + 1
     fprintf(output, "@ARG\n");
-    fprintf(output, "D=A+1\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "D=D+1\n");
     fprintf(output, "@SP\n");
     fprintf(output, "M=D\n");
-    //ARG=*(FRAME-3)
-    fprintf(output, "@2\n");
-    fprintf(output, "D=A\n");
-    fprintf(output, "@FRAME\n");
-    fprintf(output, "A=D+A\n");
-    fprintf(output, "D=A\n");
+    // R6 = LCL
+    fprintf(output, "@LCL\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@R6\n");
+    fprintf(output, "M=D\n");
+    // RET = R6 - 5
+    fprintf(output, "@5\n");
+    fprintf(output, "D=D-A\n");
+    fprintf(output, "@RET\n");
+    fprintf(output, "M=D\n");
+    // ARG = R6 - 3
+    fprintf(output, "@R6\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@3\n");
+    fprintf(output, "D=D-A\n");
     fprintf(output, "@ARG\n");
     fprintf(output, "M=D\n");
-    //LCL=*(FRAME-4)
-    fprintf(output, "@1\n");
-    fprintf(output, "D=A\n");
-    fprintf(output, "@FRAME\n");
-    fprintf(output, "A=D+A\n");
-    fprintf(output, "D=A\n");
+    // LCL = R6 - 4
+    fprintf(output, "D=D-1\n");
     fprintf(output, "@LCL\n");
     fprintf(output, "M=D\n");
-    //GOTO RET
-    fprintf(output, "@FRAME\n");
-    fprintf(output, "A=M\n");
+    // goto RET
+    fprintf(output, "@RET\n");
     fprintf(output, "0;JMP\n");
   }
 }
