@@ -347,7 +347,6 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
     fprintf(output, "(retAddr.%d)\n", *conditioncounter);
 
     *conditioncounter = *conditioncounter + 1;
-    printf("è un call\n");
   }
   else if (!strcmp(cmd, "return"))
   {
