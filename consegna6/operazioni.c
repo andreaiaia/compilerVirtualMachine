@@ -69,8 +69,7 @@ void identificalabel(char riga[], char seg[]) {
   seg[j] = '\0';
 }
 
-void estrainum(char riga[], char num[])
-{
+void estrainum(char riga[], char num[]) {
   int i = 0, j = 0;
   while (riga[i] != ' ')
     i++;
@@ -283,7 +282,7 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
     char num[strlen(riga)];
     estrainum(riga, num);
     int nnum = a_to_i(num);
-    for (int i = 1; i <= nnum; i++) {
+    for (int i = 0; i < nnum; i++) {
       fprintf(output, "@%d\n", i);
       fprintf(output, "D=A\n");
       fprintf(output, "@LCL\n");
@@ -294,11 +293,78 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
   }
   else if (!strcmp(cmd, "call"))
   {
+    char nomefun[strlen(riga)];
+    identificalabel(riga, nomefun);
+    char anum[strlen(riga)];
+    estrainum(riga, anum);
+    int num = a_to_i(anum);
+    // push return-address
+    fprintf(output, "@retAddr.%d\n", *conditioncounter);
+    fprintf(output, "D=A\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "M=D\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M+1\n");
+    // push LCL
+    fprintf(output, "@LCL\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "M=D\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M+1\n");
+    // push ARG
+    fprintf(output, "@ARG\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "A=M\n");
+    fprintf(output, "M=D\n");
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M+1\n");
+    // push THIS -- OMITTED
+    fprintf(output, "@SP\n");
+    fprintf(output, "M=M+1\n");
+    // push THAT -- OMITTED
+    fprintf(output, "M=M+1\n");
+    // ARG = SP - n - 5
+    fprintf(output, "@SP\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@%d\n", num);
+    fprintf(output, "D=D-A\n");
+    fprintf(output, "@5\n");
+    fprintf(output, "D=D-A\n");
+    fprintf(output, "@ARG\n");
+    fprintf(output, "M=D\n");
+    // LCL = SP
+    fprintf(output, "@SP\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@LCL\n");
+    fprintf(output, "M=D\n");
+    // goto f
+    fprintf(output, "@%s\n", nomefun);
+    fprintf(output, "0;JMP\n");
+    fprintf(output, "(retAddr.%d)\n", *conditioncounter);
+
     *conditioncounter = *conditioncounter + 1;
     printf("è un call\n");
   }
   else if (!strcmp(cmd, "return"))
   {
+    // FRAME = LCL
+    fprintf(output, "@LCL\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@FRAME\n");
+    fprintf(output, "M=D\n");
+    // RET = FRAME - 5
+    fprintf(output, "@FRAME\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@5\n");
+    fprintf(output, "D=D-A\n");
+    fprintf(output, "A=D\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@RET\n");
+    fprintf(output, "M=D\n");
     // ARG = pop()
     fprintf(output, "@SP\n");
     fprintf(output, "M=M-1\n");
@@ -313,27 +379,25 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
     fprintf(output, "D=D+1\n");
     fprintf(output, "@SP\n");
     fprintf(output, "M=D\n");
-    // RET = LCL - 5
-    fprintf(output, "@LCL\n");
+    // THAT = FRAME -1 -- OMITTED
+    // THIS = FRAME -2 -- OMITTED
+    // ARG = FRAME - 3
+    fprintf(output, "@FRAME\n");
     fprintf(output, "D=M\n");
-    fprintf(output, "@5\n");
+    fprintf(output, "@3\n");
     fprintf(output, "D=D-A\n");
-    fprintf(output, "@RET\n");
-    fprintf(output, "M=D\n");
-    // LCL = R6 - 4
-    fprintf(output, "D=D+1\n");
-    fprintf(output, "A=D\n");
-    fprintf(output, "D=M\n");
-    fprintf(output, "@LCL\n");
-    fprintf(output, "M=D\n");
-    // ARG = R6 - 3
-    fprintf(output, "@RET\n");
-    fprintf(output, "D=M\n");
-    fprintf(output, "@2\n");
-    fprintf(output, "D=D+A\n");
     fprintf(output, "A=D\n");
     fprintf(output, "D=M\n");
     fprintf(output, "@ARG\n");
+    fprintf(output, "M=D\n");
+    // LCL = FRAME - 4
+    fprintf(output, "@FRAME\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@4\n");
+    fprintf(output, "D=D-A\n");
+    fprintf(output, "A=D\n");
+    fprintf(output, "D=M\n");
+    fprintf(output, "@LCL\n");
     fprintf(output, "M=D\n");
     // goto RET
     fprintf(output, "@RET\n");
@@ -342,8 +406,7 @@ void exec_cmd(char riga[], char cmd[], FILE * output, int * conditioncounter, ch
   }
 }
 
-void exec_seg_push(char riga[], char seg[], FILE *output, char assm[])
-{
+void exec_seg_push(char riga[], char seg[], FILE *output, char assm[]) {
   char num[strlen(riga)];
   estrainum(riga, num);
   if (!strcmp(seg, "constant")) 
@@ -381,8 +444,7 @@ void exec_seg_push(char riga[], char seg[], FILE *output, char assm[])
   fprintf(output, "M=M+1\n");
 }
 
-void exec_seg_pop(char riga[], char seg[], FILE *output, char assm[])
-{
+void exec_seg_pop(char riga[], char seg[], FILE *output, char assm[]) {
   char num[strlen(riga)];
   estrainum(riga, num);
   if (!strcmp(seg, "local"))
